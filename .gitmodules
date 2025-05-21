@@ -1,0 +1,21 @@
+[submodule "discovery-service"]
+	path = discovery-service
+	url = https://github.com/NextSpringMysqlMSA/NSMM-discovery-service.git
+[submodule "config-service"]
+	path = config-service
+	url = https://github.com/NextSpringMysqlMSA/NSMM-config-service.git
+[submodule "auth-service"]
+	path = auth-service
+	url = https://github.com/NextSpringMysqlMSA/NSMM-auth-service.git
+[submodule "tcfd-service"]
+	path = tcfd-service
+	url = https://github.com/NextSpringMysqlMSA/NSMM-tcfd-service.git
+[submodule "csdd-service"]
+	path = csdd-service
+	url = https://github.com/NextSpringMysqlMSA/csdd-service.git
+[submodule "gri-service"]
+	path = gri-service
+	url = https://github.com/NextSpringMysqlMSA/gir-service.git
+[submodule "dashboard-service"]
+	path = dashboard-service
+	url = https://github.com/NextSpringMysqlMSA/dashboard-service.git
