@@ -2,7 +2,7 @@ name: Deploy All Services from S3 to EKS
 
 on:
   push:
-    branches: [ main ] 
+    branches: [ main ]
 
 jobs:
   deploy:
@@ -18,7 +18,7 @@ jobs:
 
       - name: Update Kubeconfig for EKS
         run: |
-          aws eks update-kubeconfig --region ap-northeast-2 --name nsmm-cluster
+          aws eks update-kubeconfig --region ap-northeast-2 --name nsmm-eks
 
       - name: Download all YAMLs from S3
         run: |
