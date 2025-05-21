@@ -2,7 +2,7 @@ name: Deploy All Services from S3 to EKS
 
 on:
   push:
-    branches: [ main ]  # 또는 workflow_dispatch 로 변경 가능
+    branches: [ main ] 
 
 jobs:
   deploy:
