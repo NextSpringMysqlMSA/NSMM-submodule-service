@@ -19,3 +19,12 @@
 [submodule "dashboard-service"]
 	path = dashboard-service
 	url = https://github.com/NextSpringMysqlMSA/dashboard-service.git
+[submodule "frontend"]
+	path = frontend
+	url = https://github.com/NextSpringMysqlMSA/ESG-project2-frontend.git
+[submodule "front"]
+	path = front
+	url = https://github.com/NextSpringMysqlMSA/ESG-project2-frontend.git
+[submodule "frontend-service"]
+	path = frontend-service
+	url = https://github.com/NextSpringMysqlMSA/ESG-project2-frontend.git
