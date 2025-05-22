@@ -37,3 +37,6 @@
 [submodule "news-crawl-service"]
 	path = news-crawl-service
 	url = https://github.com/NextSpringMysqlMSA/news-crawl-service.git
+[submodule "gateway-service"]
+	path = gateway-service
+	url = https://github.com/NextSpringMysqlMSA/NSMM-gateway-service.git
