@@ -1,4 +1,4 @@
-name: Build and Deploy All Services to EKS
+name: Build and Deploy Changed Services to EKS
 
 on:
   push:
@@ -23,16 +23,22 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and Push Docker Images
+      - name: Detect changed services (submodules only)
+        id: changed
         run: |
-          docker buildx build --platform linux/amd64 -t ${{ secrets.DOCKERHUB_USERNAME }}/auth-service:latest --push ./auth-service
-          docker buildx build --platform linux/amd64 -t ${{ secrets.DOCKERHUB_USERNAME }}/config-service:latest --push ./config-service
-          docker buildx build --platform linux/amd64 -t ${{ secrets.DOCKERHUB_USERNAME }}/discovery-service:latest --push ./discovery-service
-          docker buildx build --platform linux/amd64 -t ${{ secrets.DOCKERHUB_USERNAME }}/tcfd-service:latest --push ./tcfd-service
-          docker buildx build --platform linux/amd64 -t ${{ secrets.DOCKERHUB_USERNAME }}/gri-service:latest --push ./gri-service
-          docker buildx build --platform linux/amd64 -t ${{ secrets.DOCKERHUB_USERNAME }}/csdd-service:latest --push ./csdd-service
-          docker buildx build --platform linux/amd64 -t ${{ secrets.DOCKERHUB_USERNAME }}/dashboard-service:latest --push ./dashboard-service
-          docker buildx build --platform linux/amd64 -t ${{ secrets.DOCKERHUB_USERNAME }}/frontend-service:latest --push ./frontend-service
+          git fetch origin main
+          CHANGED=$(git diff --submodule=log origin/main...HEAD | grep -E '^\+Submodule' | cut -d' ' -f2 | sort -u)
+          echo "changed_dirs=$CHANGED" >> $GITHUB_OUTPUT
+
+      - name: Build and Push Changed Docker Images
+        if: steps.changed.outputs.changed_dirs != ''
+        run: |
+          for dir in ${{ steps.changed.outputs.changed_dirs }}; do
+            if [ -f "$dir/Dockerfile" ]; then
+              echo "📦 Building $dir"
+              docker buildx build --platform linux/amd64 -t ${{ secrets.DOCKERHUB_USERNAME }}/$dir:latest --push ./$dir
+            fi
+          done
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
@@ -50,20 +56,25 @@ jobs:
           mkdir -p k8s-yaml
           aws s3 cp s3://esg-storage-bucket/k8s-yaml/ ./k8s-yaml/ --recursive
 
-      - name: Replace image tags in deployment YAMLs
+      - name: Replace image tags in deployment YAMLs (only changed)
+        if: steps.changed.outputs.changed_dirs != ''
         run: |
-          sed -i "s|image: .*auth-service.*|image: ${{ secrets.DOCKERHUB_USERNAME }}/auth-service:latest|g" k8s-yaml/auth-service/*.yaml || true
-          sed -i "s|image: .*config-service.*|image: ${{ secrets.DOCKERHUB_USERNAME }}/config-service:latest|g" k8s-yaml/config-service/*.yaml || true
-          sed -i "s|image: .*discovery-service.*|image: ${{ secrets.DOCKERHUB_USERNAME }}/discovery-service:latest|g" k8s-yaml/discovery-service/*.yaml || true
-          sed -i "s|image: .*tcfd-service.*|image: ${{ secrets.DOCKERHUB_USERNAME }}/tcfd-service:latest|g" k8s-yaml/tcfd-service/*.yaml || true
-          sed -i "s|image: .*gri-service.*|image: ${{ secrets.DOCKERHUB_USERNAME }}/gri-service:latest|g" k8s-yaml/gri-service/*.yaml || true
-          sed -i "s|image: .*csdd-service.*|image: ${{ secrets.DOCKERHUB_USERNAME }}/csdd-service:latest|g" k8s-yaml/csdd-service/*.yaml || true
-          sed -i "s|image: .*dashboard-service.*|image: ${{ secrets.DOCKERHUB_USERNAME }}/dashboard-service:latest|g" k8s-yaml/dashboard-service/*.yaml || true
-          sed -i "s|image: .*frontend-service.*|image: ${{ secrets.DOCKERHUB_USERNAME }}/frontend-service:latest|g" k8s-yaml/frontend-service/*.yaml || true
+          for dir in ${{ steps.changed.outputs.changed_dirs }}; do
+            path="k8s-yaml/${dir}"
+            if [ -d "$path" ]; then
+              sed -i "s|image: .*${dir}.*|image: ${{ secrets.DOCKERHUB_USERNAME }}/$dir:latest|g" $path/*.yaml || true
+            fi
+          done
 
-      - name: Apply YAMLs to EKS
+      - name: Apply YAMLs to EKS (only changed)
+        if: steps.changed.outputs.changed_dirs != ''
         run: |
-          find k8s-yaml -type f -name "*.yaml" | while read file; do
-            echo "▶️ Applying $file"
-            kubectl apply -f "$file"
+          for dir in ${{ steps.changed.outputs.changed_dirs }}; do
+            path="k8s-yaml/${dir}"
+            if [ -d "$path" ]; then
+              echo "▶️ Applying $dir YAMLs"
+              find $path -type f -name "*.yaml" | while read file; do
+                kubectl apply -f "$file"
+              done
+            fi
           done
