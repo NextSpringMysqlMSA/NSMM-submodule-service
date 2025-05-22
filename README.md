@@ -1,3 +1,4 @@
+
 # 🌱 NSMM-submodule-service
 
 **ESG 데이터 통합 분석 및 실시간 모니터링 플랫폼**의 MSA 기반 배포 리포지토리입니다.  
@@ -102,3 +103,4 @@ git clone --recurse-submodules https://github.com/NextSpringMysqlMSA/NSMM-submod
 - ESG 등급 자동 산출 로직 도입
 - 배출량 기반 리스크 스코어링 기능 연동
 - 다국어 대응 ESG 리포트 출력 기능
+
