@@ -31,9 +31,6 @@
 [submodule "dart-service"]
 	path = dart-service
 	url = https://github.com/NextSpringMysqlMSA/dart-service.git
-[submodule "esg-news-analyzer"]
-	path = esg-news-analyzer
-	url = https://github.com/NextSpringMysqlMSA/ESG-NewsAnalysis.git
 [submodule "news-crawl-service"]
 	path = news-crawl-service
 	url = https://github.com/NextSpringMysqlMSA/news-crawl-service.git
