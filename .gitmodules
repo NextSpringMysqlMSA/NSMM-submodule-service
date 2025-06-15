@@ -28,9 +28,9 @@
 [submodule "frontend-service"]
 	path = frontend-service
 	url = https://github.com/NextSpringMysqlMSA/ESG-project2-frontend.git
-[submodule "company-api"]
-	path = company-api
-	url = https://github.com/NextSpringMysqlMSA/company-api-service.git
+[submodule "dart-service"]
+	path = dart-service
+	url = https://github.com/NextSpringMysqlMSA/dart-service.git
 [submodule "esg-news-analyzer"]
 	path = esg-news-analyzer
 	url = https://github.com/NextSpringMysqlMSA/ESG-NewsAnalysis.git
